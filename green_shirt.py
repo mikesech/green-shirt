@@ -36,14 +36,26 @@ def text_to_mp3(text):
     raise StandardError("Bad status querying Google: %i (%s)" % (response.status, response.reason))
   return response.read()
 
+def text_to_many_mp3s(text):
+  x = text[:]
+  mp3s = []
+  while len(x) > 0:
+    a = x[:100]
+    x = x[100:]
+    mp3s.append(text_to_mp3(a))
+  return mp3s
+
 def play_mp3_from_memory(mp3):
   p = subprocess.Popen(["/usr/bin/mpg123", "-"], stdin=subprocess.PIPE)
   p.communicate(input=mp3)
   p.wait()
+def play_many_mp3s_from_memory(mp3s):
+  for m in mp3s:
+    play_mp3_from_memory(m)
 
 def speak_text(text):
-  mp3 = text_to_mp3(text)
-  play_mp3_from_memory(mp3)
+  mp3s = text_to_many_mp3s(text)
+  play_many_mp3s_from_memory(mp3s)
 
 def handle_message(subject, body):
   if re.search(r'\[GREEN SHIRT\]', subject) is None:
