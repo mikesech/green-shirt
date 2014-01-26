@@ -40,8 +40,19 @@ def text_to_many_mp3s(text):
   x = text[:]
   mp3s = []
   while len(x) > 0:
-    a = x[:100]
-    x = x[100:]
+    if len(x) > 100:
+      a = x[:100]
+      # TODO: don't remove the last word if x[100] is not alphanumeric
+      m = re.search(r'\W\w*$', a)
+      if m is None:
+        x = x[100:]
+      else:
+        size = m.start()
+        a = x[:size]
+        x = x[size:]
+    else:
+      a = x
+      x = []
     mp3s.append(text_to_mp3(a))
   return mp3s
 
