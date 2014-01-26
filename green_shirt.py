@@ -4,9 +4,15 @@ IMAP_HOST = XXX_CONFIGURE_ME
 USERNAME =  XXX_CONFIGURE_ME
 PASSWORD =  XXX_CONFIGURE_ME
 
-import imaplib, email, email.parser, re, httplib, urllib, subprocess, sys, quopri
+IFTTT_FOOTER = "IFTTT\r\n\r\n\tvia Personal Recipe"
+
+import imaplib, email, email.parser, re, httplib, urllib, subprocess, sys, quopri, string
 from yaml import dump
 from time import sleep
+
+def filter_ifttt_footer(text):
+  i = string.rfind(text, IFTTT_FOOTER)
+  return text[:i] if i > -1 else text
 
 def extract_text_body(msg):
   for part in msg.walk():
@@ -72,6 +78,7 @@ def handle_message(subject, body):
   if re.search(r'\[GREEN SHIRT\]', subject) is None:
     print "skipping message: %s" % subject
   else:
+    body = filter_ifttt_footer(body)
     print "new message: %s" % body
     try:
       speak_text(body)
