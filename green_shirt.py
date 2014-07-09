@@ -7,7 +7,6 @@ PASSWORD =  XXX_CONFIGURE_ME
 IFTTT_FOOTER = "IFTTT\r\n\r\n\tvia Personal Recipe"
 
 import imaplib, email, email.parser, re, httplib, urllib, subprocess, sys, quopri, string
-from yaml import dump
 from time import sleep
 
 def filter_ifttt_footer(text):
