@@ -21,6 +21,8 @@ def extract_text_body(msg):
   
 def text_to_mp3(text):
   text = text.strip()
+  if len(text) == 0:
+    return None
   if len(text) > 100:
     print >> sys.stderr, "warning: text too long"
     text = text[:100]
@@ -59,7 +61,9 @@ def text_to_many_mp3s(text):
     else:
       a = x
       x = []
-    mp3s.append(text_to_mp3(a))
+    mp3 = text_to_mp3(a)
+    if mp3 is not None:
+      mp3s.append(mp3)
   return mp3s
 
 def play_mp3_from_memory(mp3):
