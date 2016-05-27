@@ -4,7 +4,7 @@ IMAP_HOST = XXX_CONFIGURE_ME
 USERNAME =  XXX_CONFIGURE_ME
 PASSWORD =  XXX_CONFIGURE_ME
 
-IFTTT_FOOTER = "IFTTT\r\n\r\n\tvia Personal Recipe"
+IFTTT_FOOTER = "IFTTT\r\n\r\n\tEdit or turn off Personal Recipe"
 
 import imaplib, email, email.parser, re, httplib, urllib, subprocess, sys, quopri, string
 from time import sleep
@@ -27,7 +27,7 @@ def text_to_mp3(text):
     print >> sys.stderr, "warning: text too long"
     text = text[:100]
   conn = httplib.HTTPConnection("translate.google.com")
-  headers = {"Referer": "http://translate.google.com/", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0)"}
+  headers = {"Referer": "http://translate.google.com/", "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"}
   params = urllib.urlencode({
     'ie': 'UTF-8',
     'tl': 'en',
@@ -45,7 +45,7 @@ def text_to_mp3(text):
   return response.read()
 
 def text_to_many_mp3s(text):
-  x = text[:]
+  x = text.strip()
   mp3s = []
   while len(x) > 0:
     if len(x) > 100:
@@ -67,7 +67,7 @@ def text_to_many_mp3s(text):
   return mp3s
 
 def play_mp3_from_memory(mp3):
-  p = subprocess.Popen(["/usr/bin/mpg123", "-"], stdin=subprocess.PIPE)
+  p = subprocess.Popen(["mpg123", "-"], stdin=subprocess.PIPE)
   p.communicate(input=mp3)
   p.wait()
 def play_many_mp3s_from_memory(mp3s):
@@ -75,14 +75,17 @@ def play_many_mp3s_from_memory(mp3s):
     play_mp3_from_memory(m)
 
 def speak_text(text):
-  mp3s = text_to_many_mp3s(text)
-  play_many_mp3s_from_memory(mp3s)
+    #mp3s = text_to_many_mp3s(text)
+    #play_many_mp3s_from_memory(mp3s)
+    p = subprocess.Popen(["say"], stdin=subprocess.PIPE)
+    p.communicate(input=text)
+    p.wait()
 
 def handle_message(subject, body):
   if re.search(r'\[GREEN SHIRT\]', subject) is None:
     print "skipping message: %s" % subject
   else:
-    body = filter_ifttt_footer(body)
+    body = filter_ifttt_footer(body).strip()
     print "new message: %s" % body
     try:
       speak_text(body)
